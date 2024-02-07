@@ -10,6 +10,7 @@ build
 client/src/contracts
 client/*/src/contracts
 client/package.json
+truffle/contracts/*.sol
 
 # Testing
 coverage
