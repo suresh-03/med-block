@@ -10,7 +10,7 @@ build
 client/src/contracts
 client/*/src/contracts
 client/package.json
-truffle/contracts/*.sol
+truffle
 
 # Testing
 coverage
@@ -31,4 +31,3 @@ coverage
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-truffle

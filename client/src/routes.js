@@ -57,7 +57,7 @@ const routes = [
         path: 'unknown',
         element: (
           <>
-            <HeaderAppBar />
+            {/* <HeaderAppBar /> */}
             <AlertPopup />
             <Unknown />
           </>
