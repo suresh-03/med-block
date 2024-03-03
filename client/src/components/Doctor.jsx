@@ -8,7 +8,7 @@ import useAlert from '../contexts/AlertContext/useAlert'
 
 
 const Doctor = ({ doctor }) => {
-  const [doctorId,hospitalId,doctorName,doctorEmail,doctorContact,doctorWork] = doctor
+  const [doctorId,hospitalId] = doctor
 
 
   const {setAlert} = useAlert()
@@ -39,38 +39,6 @@ const Doctor = ({ doctor }) => {
                 Hospital ID
               </Typography>
               <Typography variant='h6'>{hospitalId}</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={10}>
-            <Box display='flex' flexDirection='column'>
-              <Typography variant='h6' color={grey[600]}>
-                Doctor Name
-              </Typography>
-              <Typography variant='h6'>{doctorName}</Typography>
-            </Box>
-          </Grid>
-            <Grid item xs={10}>
-            <Box display='flex' flexDirection='column'>
-              <Typography variant='h6' color={grey[600]}>
-                Doctor Email
-              </Typography>
-              <Typography variant='h6'>{doctorEmail}</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={10}>
-            <Box display='flex' flexDirection='column'>
-              <Typography variant='h6' color={grey[600]}>
-                Doctor Contact
-              </Typography>
-              <Typography variant='h6'>{doctorContact}</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={10}>
-            <Box display='flex' flexDirection='column'>
-              <Typography variant='h6' color={grey[600]}>
-                Doctor Role
-              </Typography>
-              <Typography variant='h6'>{doctorWork}</Typography>
             </Box>
           </Grid>
         </Grid>

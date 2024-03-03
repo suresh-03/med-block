@@ -8,6 +8,7 @@ import SendIcon from '@mui/icons-material/Send';
 import Stack from '@mui/material/Stack';
 import useEth from '../contexts/EthContext/useEth'
 import useAlert from '../contexts/AlertContext/useAlert'
+import Proof from './Proof.jsx'
 
 
 
@@ -37,6 +38,23 @@ const Request = ({ request }) => {
     }
   }
 
+  const verifyProof = async () => {
+    try{
+    const doctorData = await contract.methods.verifyDoctor(doctorId).call({ form: accounts[0] })
+    if(doctorData != ''){
+      return(
+        <Proof proof={doctorData}/>
+        )
+    }
+    else{
+      setAlert("No proof found!",'error')
+    }
+  }
+  catch(err){
+    console.log(err)
+  }
+  }
+
  
  
 
@@ -58,7 +76,8 @@ const Request = ({ request }) => {
               <Typography variant='h6'>{doctorId}</Typography>
             </Box>
           </Grid>
-          <Grid item xs={10}>
+          
+           <Grid item xs={10}>
             <Box display='flex' flexDirection='column'>
               <Typography variant='h6' color={grey[600]}>
                 Access
@@ -77,6 +96,9 @@ const Request = ({ request }) => {
         Reject
       </Button>
       <Button variant="contained" color='success' value={doctorId} endIcon={<SendIcon />} onClick={(e) => givePermission(e.target.value,true)}>
+        Accept
+      </Button>
+      <Button variant="contained" color='primary'  endIcon={<SendIcon />} onClick={() => verifyProof()}>
         Accept
       </Button>
     </Stack>

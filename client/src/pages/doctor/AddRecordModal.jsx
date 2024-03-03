@@ -28,7 +28,7 @@ const AddRecordModal = ({ handleClose, handleUpload, patientAddress }) => {
         var encrypted = CryptoJS.AES.encrypt(wordArray, key).toString();        // Encryption: I: WordArray -> O: -> Base64 encoded string (OpenSSL
         const buff = Buffer.from(encrypted);
         setBuffer(buff)
-        console.log(buff)
+        console.log(buff.toString())
 
         // var a = document.createElement("a");
         // var url = window.URL.createObjectURL(fileEnc);

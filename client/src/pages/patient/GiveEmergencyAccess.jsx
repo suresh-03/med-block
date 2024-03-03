@@ -19,10 +19,6 @@ const GiveEmergencyAccess = () => {
   const {setAlert} = useAlert()
 
   const [personAddress,setPersonAddress] = useState('')
-  const [personName,setPersonName] = useState('')
-  const [personRelation,setPersonRelation] = useState('')
-  const [personContact,setPersonContact] = useState('')
-  const [personLocation,setPersonLocation] = useState('')
 
 
     const addAccess = async () => {
@@ -31,25 +27,8 @@ const GiveEmergencyAccess = () => {
         setAlert('Please enter a valid wallet address', 'error')
         return
       }
-      if(personName == ""){
-        setAlert("Enter valid name",'error')
-        return
-      }
-      if(personRelation == ""){
-        setAlert("Enter valid relation",'error')
-        return
-      }
-       if(!validator.isMobilePhone(personContact)){
-        setAlert("Enter valid mobile number",'error')
-        return
-      }
-      if(personLocation == ""){
-        setAlert("Enter valid location",'error')
-        return
-      }
-     
 
-        await contract.methods.addEmergencyAccess(personAddress,personName,personRelation,personContact,personLocation,true).send({ from: accounts[0] })
+        await contract.methods.addEmergencyAccess(personAddress,true).send({ from: accounts[0] })
         // console.log(requests)
         setAlert("Emergency person added successfully",'success')
         return
@@ -94,57 +73,6 @@ const GiveEmergencyAccess = () => {
                         InputLabelProps={{ style: { fontSize: '15px' } }}
                         size='small'
                       />
-                    </FormControl>
-                    </Box>
-                  <Box display='flex' alignItems='center' my={1}>
-                    <FormControl fullWidth>
-                      <TextField
-                        variant='outlined'
-                        placeholder='Enter parson name'
-                        value={personName}
-                        onChange={e => setPersonName(e.target.value)}
-                        InputProps={{ style: { fontSize: '15px' } }}
-                        InputLabelProps={{ style: { fontSize: '15px' } }}
-                        size='small'
-                      />
-                    </FormControl>
-                    </Box>
-                  <Box display='flex' alignItems='center' my={1}>
-                    <FormControl fullWidth>
-                      <TextField
-                        variant='outlined'
-                        placeholder='Enter person relation'
-                        value={personRelation}
-                        onChange={e => setPersonRelation(e.target.value)}
-                        InputProps={{ style: { fontSize: '15px' } }}
-                        InputLabelProps={{ style: { fontSize: '15px' } }}
-                        size='small'
-                      />
-                    </FormControl>
-                    </Box>
-                 
-                  <Box display='flex' alignItems='center' my={1}>
-                    <FormControl fullWidth>
-                      <TextField
-                        variant='outlined'
-                        placeholder='Enter person mobile number'
-                        value={personContact}
-                        onChange={e => setPersonContact(e.target.value)}
-                        InputProps={{ style: { fontSize: '15px' } }}
-                        InputLabelProps={{ style: { fontSize: '15px' } }}
-                        size='small'
-                      />
-                    </FormControl>
-                    </Box>
-                  <Box display='flex' alignItems='center' my={1}>
-                    <FormControl fullWidth>
-                      <textarea
-                        rows="8"
-                        cols="50"
-                        placeholder='Enter patient location'
-                        value={personLocation}
-                        onChange={e => setPersonLocation(e.target.value)}
-                      ></textarea>
                     </FormControl>
                     </Box>
                     <Box mx={2}>

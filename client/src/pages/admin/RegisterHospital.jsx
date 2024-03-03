@@ -7,14 +7,11 @@ import { useNavigate } from 'react-router-dom'
 import useAlert from '../../contexts/AlertContext/useAlert'
 import { useState } from 'react'
 import '../../App.css'
-import validator from 'validator'
 import AdminAccess from '../../components/access/adminAccess'
 
 const RegisterHospital = () => {
 
 const [hospitalAddress,setHospitalAddress] = useState('')
-const [hospitalName,setHospitalName] = useState('')
-const [hospitalContact,setHospitalContact] = useState('')
 
 
   const {
@@ -31,17 +28,9 @@ const [hospitalContact,setHospitalContact] = useState('')
         setAlert('Please enter a valid hospital address', 'error')
         return
       }
-      if(hospitalName == ""){
-        setAlert('Please enter valid hospital name','error')
-        return
-      }
-      if(!validator.isMobilePhone(hospitalContact,'en-IN')){
-        setAlert("Please enter valid hospital mobile no",'error')
-        return
-      }
     
 
-      await contract.methods.addHospital(hospitalAddress,hospitalName,hospitalContact).send({ from: accounts[0] })
+      await contract.methods.addHospital(hospitalAddress).send({ from: accounts[0] })
       setAlert('Hospital Added Successfully!','success')
       // dispatch({
       //   type: 'ADD_DOCTOR',
@@ -80,35 +69,7 @@ const [hospitalContact,setHospitalContact] = useState('')
                       />
                     </FormControl>
                   </Box>
-                  <Box display='flex' alignItems='center' my={1}>
-                    <FormControl fullWidth>
-                      <TextField
-                        color='secondary'
-                        variant='outlined'
-                        placeholder='Enter hospital Name'
-                        value={hospitalName}
-                        onChange={e => setHospitalName(e.target.value)}
-                        InputProps={{ style: { fontSize: '15px'} }}
-                        InputLabelProps={{ style: { fontSize: '15px'} }}
-                        size='small'
-                      />
-                    </FormControl>
-                  </Box>
-                  <Box display='flex' alignItems='center' my={1}>
-                    <FormControl fullWidth>
-                      <TextField
-                        color='secondary'
-                        variant='outlined'
-                        placeholder='Enter hospital Mobile Number'
-                        value={hospitalContact}
-                        onChange={e => setHospitalContact(e.target.value)}
-                        InputProps={{ style: { fontSize: '15px'} }}
-                        InputLabelProps={{ style: { fontSize: '15px'} }}
-                        size='small'
-                      />
-                    </FormControl>
-                  </Box>
-              <CustomButton text='Hospital Register' handleClick={() => registerHospital()}>
+                <CustomButton text='Hospital Register' handleClick={() => registerHospital()}>
                 <PersonAddAlt1RoundedIcon style={{ color: 'white' }} />
               </CustomButton>
             {/*</Box>*/}

@@ -8,7 +8,7 @@ import useAlert from '../contexts/AlertContext/useAlert'
 
 
 const Hospital = ({ hospital }) => {
-  const [hospitalId,hospitalName,hospitalContact,hospitalDoctors] = hospital
+  const [hospitalId,hospitalDoctors] = hospital
 
 
   const {setAlert} = useAlert()
@@ -31,22 +31,6 @@ const Hospital = ({ hospital }) => {
                 Hospital ID
               </Typography>
               <Typography variant='h6'>{hospitalId}</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={10}>
-            <Box display='flex' flexDirection='column'>
-              <Typography variant='h6' color={grey[600]}>
-                hospital Name
-              </Typography>
-              <Typography variant='h6'>{hospitalName}</Typography>
-            </Box>
-          </Grid>
-            <Grid item xs={10}>
-            <Box display='flex' flexDirection='column'>
-              <Typography variant='h6' color={grey[600]}>
-                hospital Contact
-              </Typography>
-              <Typography variant='h6'>{hospitalContact}</Typography>
             </Box>
           </Grid>
         </Grid>

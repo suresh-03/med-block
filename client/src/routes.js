@@ -17,6 +17,7 @@ import ViewRequests from './pages/patient/ViewRequests'
 import GiveEmergencyAccess from './pages/patient/GiveEmergencyAccess'
 import ViewEmergencyAccess from './pages/patient/ViewEmergencyAccess'
 import SeeRequests from './pages/emergencyPerson/SeeRequests'
+import EmergencyHistory from './pages/patient/EmergencyHistory'
 
 const routes = [
   {
@@ -118,6 +119,16 @@ const routes = [
             <HeaderAppBar />
             <AlertPopup />
             <ViewEmergencyAccess />
+          </>
+        ),
+      },
+       {
+        path: 'patient/viewAccessHistory',
+        element: (
+          <>
+            <HeaderAppBar />
+            <AlertPopup />
+            <EmergencyHistory />
           </>
         ),
       },

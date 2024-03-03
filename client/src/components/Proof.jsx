@@ -2,7 +2,6 @@ import { Card, CardContent, Typography, Grid, Box } from '@mui/material'
 import React from 'react'
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded'
 import { grey } from '@mui/material/colors'
-import moment from 'moment'
 import CloudDownloadRoundedIcon from '@mui/icons-material/CloudDownloadRounded'
 import CryptoJS from "crypto-js";
 import CustomButton from './CustomButton'
@@ -10,8 +9,8 @@ import CustomButton from './CustomButton'
 
 
 
-const Record = ({ record }) => {
-  const [cid, name, patientId, doctorId, timestamp] = record
+const Proof = ({ proof }) => {
+  const proofCID = proof
   // const [b64,setb64] = useState("")
 
   function convertWordArrayToUint8Array(wordArray) {
@@ -31,9 +30,9 @@ const Record = ({ record }) => {
 
  const fetchData = async () => {
       try {
-        alert('Encrypted Content Identifier(CID):\n\n'+cid)
-        const keyCID = "oiewrhg5623475vbeihc39873948^&%E@ZfytfE#&@^ tf1wufhx231277!*YE2"
-       const decryptedBytes = CryptoJS.AES.decrypt(cid, keyCID);
+        alert('Encrypted Content Identifier(CID):\n\n'+proofCID)
+        const keyCID = "oiewrhg5623475vbeihc39873948^&%E@ZfytfE#&@^ tf1wufhx231277!*YE2uygdwfyq64r%$Eyt324yrg"
+       const decryptedBytes = CryptoJS.AES.decrypt(proofCID, keyCID);
         const decryptedCID = decryptedBytes.toString(CryptoJS.enc.Utf8);              // Decryption: I: Base64 encoded string (OpenSSL-format) -> O: WordArray
         const response = await fetch(`https://med-chain.infura-ipfs.io/ipfs/${decryptedCID}`);
         if (!response.ok) {
@@ -48,7 +47,7 @@ const Record = ({ record }) => {
 
         var a = document.createElement("a");
         var url = window.URL.createObjectURL(fileDec);
-        var filename = name;
+        var filename = "proof";
         a.href = url;
         a.download = filename;
         a.click();
@@ -71,30 +70,6 @@ const Record = ({ record }) => {
           <Grid item xs={1}>
             <DescriptionRoundedIcon style={{ fontSize: 40, color: grey[700] }} />
           </Grid>
-          <Grid item xs={3}>
-            <Box display='flex' flexDirection='column'>
-              <Typography variant='h6' color={grey[600]}>
-                Record name
-              </Typography>
-              <Typography variant='h6'>{name}</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={5}>
-            <Box display='flex' flexDirection='column'>
-              <Typography variant='h6' color={grey[600]}>
-                Doctor
-              </Typography>
-              <Typography variant='h6'>{doctorId}</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={2}>
-            <Box display='flex' flexDirection='column'>
-              <Typography variant='h6' color={grey[600]}>
-                Created time
-              </Typography>
-              <Typography variant='h6'>{moment.unix(timestamp).format('MM-DD-YYYY HH:mm')}</Typography>
-            </Box>
-          </Grid>
           <Grid item xs={1}>
             <CustomButton handleClick={() => fetchData()}>
                       <CloudDownloadRoundedIcon style={{ color: 'white' }} />
@@ -107,4 +82,4 @@ const Record = ({ record }) => {
 }
 
 
-export default Record
+export default Proof

@@ -55,6 +55,9 @@ const HeaderAppBar = () => {
                <a className='register-patient-nav' href='/patient/viewEmergencyAccess' style={{marginLeft:20}}>
              Manage Access
               </a>
+              <a className='register-patient-nav' href='/patient/viewAccessHistory' style={{marginLeft:20}}>
+             Emergency History
+              </a>
               </>
             )}
            {role === 'emergencyPerson' && (

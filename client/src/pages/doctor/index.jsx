@@ -11,7 +11,6 @@ import CloudUploadRoundedIcon from '@mui/icons-material/CloudUploadRounded'
 import ipfs from '../../ipfs'
 import Record from '../../components/Record'
 import CryptoJS from "crypto-js";
-import Patient from '../../components/Patient'
 import DoctorAccess from '../../components/access/doctorAccess'
 
 
@@ -29,7 +28,6 @@ const Doctor = () => {
   const [addRecord, setAddRecord] = useState(false)
   const [requestPatientAddress,setRequestPatientAddress] = useState('')
   const [access,setAccess] = useState(false)
-  const [details,setDetails] = useState([])
 
 
   
@@ -47,9 +45,6 @@ const Doctor = () => {
         setAccess(access)
         if(access){
         // setAlert("you have access","success")
-        const details = await contract.methods.getPatient(searchPatientAddress).call({ from: accounts[0] })
-        console.log(details)
-        setDetails(details)
         const records = await contract.methods.getRecordsDoctor(searchPatientAddress).call({ from: accounts[0] })
         console.log('records :>> ', records)
         setRecords(records)
@@ -206,15 +201,7 @@ const Doctor = () => {
                     </>
 
                     )}
-                  {patientExist && access && (
-                     <Box display='flex' flexDirection='column' mt={3} mb={-2}>
-                        <Box mb={2}>
-                          <Patient patient={details} />
-                        </Box>
-                    </Box>
-
-                    )}
-
+                 
                   {patientExist && records.length === 0 && access && (
                     <Box display='flex' alignItems='center' justifyContent='center' my={5}>
                       <Typography variant='h5'>No records found</Typography>

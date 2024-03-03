@@ -13,7 +13,7 @@ import useAlert from '../contexts/AlertContext/useAlert'
 
 
 const Emergency = ({ emergency }) => {
-  const [personId,patientId,personName,personRelation,personContact,personLocation,access] = emergency
+  const [personId,patientId,access] = emergency
 
    const {
     state: { contract, accounts, role, loading },
@@ -60,22 +60,6 @@ const Emergency = ({ emergency }) => {
                 Patient ID
               </Typography>
               <Typography variant='h6'>{patientId}</Typography>
-               <Typography variant='h6' color={grey[600]}>
-                Person Name
-              </Typography>
-              <Typography variant='h6'>{personName}</Typography>
-              <Typography variant='h6' color={grey[600]}>
-                Relation
-              </Typography>
-              <Typography variant='h6'>{personRelation}</Typography>
-              <Typography variant='h6' color={grey[600]}>
-                Person Contact
-              </Typography>
-              <Typography variant='h6'>{personContact}</Typography>
-              <Typography variant='h6' color={grey[600]}>
-                Person Location
-              </Typography>
-              <Typography variant='h6'>{personLocation}</Typography>
             </Box>
           </Grid>
           <Grid item xs={10}>
