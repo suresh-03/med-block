@@ -8,12 +8,17 @@ import SendIcon from '@mui/icons-material/Send';
 import Stack from '@mui/material/Stack';
 import useEth from '../contexts/EthContext/useEth'
 import useAlert from '../contexts/AlertContext/useAlert'
+import {useState} from 'react'
+import Proof from './Proof'
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 
 
 
 const RequestEmergency = ({ requestEmergency }) => {
   const [access,doctorId] = requestEmergency
+  const [doctorData,setDoctorData] = useState([])
 
    const {
     state: { contract, accounts, role, loading },
@@ -37,7 +42,15 @@ const RequestEmergency = ({ requestEmergency }) => {
     }
   }
 
- 
+   const verifyDoctor = async () => {
+  try{
+  const doctorData = await contract.methods.verifyDoctor(doctorId).call({from:accounts[0]})
+  setDoctorData(doctorData)
+}
+catch(err){
+  console.error(err)
+}
+}
  
 
 
@@ -79,8 +92,21 @@ const RequestEmergency = ({ requestEmergency }) => {
       <Button variant="contained" color='success' value={doctorId} endIcon={<SendIcon />} onClick={(e) => givePermission(e.target.value,true)}>
         Accept
       </Button>
+      <Button variant="contained" color='primary'  endIcon={<SendIcon />} onClick={() => verifyDoctor()}>
+        Verify
+      </Button>
     </Stack>
                 </Box>
+            </Box>
+          </Grid>
+            <Grid item xs={10}>
+            <Box display='flex' flexDirection='column'>
+              <Typography variant='h6' color={grey[600]}>
+                ID Proof
+              </Typography>
+              {doctorData.length != 0 && (
+              <Proof proof={doctorData}/>
+                )}
             </Box>
           </Grid>
         </Grid>

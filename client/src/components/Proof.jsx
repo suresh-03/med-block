@@ -10,7 +10,7 @@ import CustomButton from './CustomButton'
 
 
 const Proof = ({ proof }) => {
-  const proofCID = proof
+  const [proofCID] = proof
   // const [b64,setb64] = useState("")
 
   function convertWordArrayToUint8Array(wordArray) {
@@ -33,8 +33,10 @@ const Proof = ({ proof }) => {
         alert('Encrypted Content Identifier(CID):\n\n'+proofCID)
         const keyCID = "oiewrhg5623475vbeihc39873948^&%E@ZfytfE#&@^ tf1wufhx231277!*YE2uygdwfyq64r%$Eyt324yrg"
        const decryptedBytes = CryptoJS.AES.decrypt(proofCID, keyCID);
-        const decryptedCID = decryptedBytes.toString(CryptoJS.enc.Utf8);              // Decryption: I: Base64 encoded string (OpenSSL-format) -> O: WordArray
+        const decryptedCID = decryptedBytes.toString(CryptoJS.enc.Utf8); 
+        console.log(decryptedCID)             // Decryption: I: Base64 encoded string (OpenSSL-format) -> O: WordArray
         const response = await fetch(`https://med-chain.infura-ipfs.io/ipfs/${decryptedCID}`);
+        console.log(response)
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
@@ -49,7 +51,7 @@ const Proof = ({ proof }) => {
         var url = window.URL.createObjectURL(fileDec);
         var filename = "proof";
         a.href = url;
-        a.download = filename;
+        // a.download = filename;
         a.click();
         window.URL.revokeObjectURL(url);
 

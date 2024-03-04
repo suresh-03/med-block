@@ -5,6 +5,7 @@ import CustomButton from '../../components/CustomButton'
 import useEth from '../../contexts/EthContext/useEth'
 import History from '../../components/History'
 import PatientAccess from '../../components/access/patientAccess'
+import useAlert from '../../contexts/AlertContext/useAlert'
 
 
 const EmergencyHistory = () => {
@@ -15,11 +16,13 @@ const EmergencyHistory = () => {
   const [history,setHistory] = useState([])
   const [viewHistory,setViewHistory] = useState(false)
 
+  const {setAlert} = useAlert()
+
 
 
     const getHistory = async () => {
       try{
-        const history = await contract.methods.viewAccessHistory(accounts[0]).call({ from: accounts[0] })
+        const history = await contract.methods.viewAccessHistory().call({ from: accounts[0] })
         // console.log(requests)
         setHistory(history)
         setViewHistory(true)
@@ -52,7 +55,7 @@ const EmergencyHistory = () => {
               {role === 'patient' && (
                 <>
                   <Box mx={2}>
-                      <CustomButton text={'See Requests'} handleClick={() => getHistory()}>
+                      <CustomButton text={'See History'} handleClick={() => getHistory()}>
                         <SearchRoundedIcon style={{ color: 'white' }} />
                       </CustomButton>
                     </Box>
@@ -66,13 +69,16 @@ const EmergencyHistory = () => {
                       ))}
                     </Box>
                     <Box mx={2}>
-                      <CustomButton text={'Close Requests'} handleClick={() => setViewHistory(false)}>
+                      <CustomButton text={'Close History'} handleClick={() => setViewHistory(false)}>
                         <SearchRoundedIcon style={{ color: 'white' }} />
                       </CustomButton>
                     </Box>
                     </>
 
 
+                      )}
+                    {history.length == 0 && viewHistory && (
+                      setAlert("No history found",'error')
                       )}
                 </>
               )}

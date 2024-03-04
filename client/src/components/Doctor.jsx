@@ -3,12 +3,13 @@ import React from 'react'
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded'
 import { grey } from '@mui/material/colors'
 import useAlert from '../contexts/AlertContext/useAlert'
+import Proof from './Proof.jsx'
 
 
 
 
 const Doctor = ({ doctor }) => {
-  const [doctorId,hospitalId] = doctor
+  const [doctorId,hospitalId,proofCID] = doctor
 
 
   const {setAlert} = useAlert()
@@ -39,6 +40,14 @@ const Doctor = ({ doctor }) => {
                 Hospital ID
               </Typography>
               <Typography variant='h6'>{hospitalId}</Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={10}>
+            <Box display='flex' flexDirection='column'>
+              <Typography variant='h6' color={grey[600]}>
+                ID Proof
+              </Typography>
+              <Proof proof={proofCID}/>
             </Box>
           </Grid>
         </Grid>

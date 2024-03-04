@@ -47,7 +47,7 @@ const [addRecord,setAddRecord] = useState(false);
        
 
         if (ipfsHash) {
-          setProofCID(ipfsHash)
+          await contract.methods.addDoctorProof(doctorAddress,ipfsHash).send({from: accounts[0]})
           setAlert('New Proof uploaded', 'success')
           setAddRecord(true)
 
@@ -72,12 +72,9 @@ const [addRecord,setAddRecord] = useState(false);
         setAlert('Please enter a valid hospital address', 'error')
         return
       }
-      if(proofCID == ''){
-        setAlert('Please add proof','error');
-        return
-      }
     
-      await contract.methods.addDoctor(doctorAddress,hospitalAddress,proofCID).send({ from: accounts[0] })
+    
+      await contract.methods.addDoctor(doctorAddress,hospitalAddress).send({ from: accounts[0] })
       setAlert('Doctor Added Successfully!','success')
       dispatch({
         type: 'ADD_DOCTOR',
@@ -138,7 +135,7 @@ const [addRecord,setAddRecord] = useState(false);
                       patientAddress={doctorAddress}
                     />
                   </Modal>
-                   <CustomButton text={'Add Proof'} handleClick={() => setAddRecord(true)} disabled={!doctorAddress}>
+                   <CustomButton text={'Add Proof'} handleClick={() => setAddRecord(true)} disabled={!/^(0x)?[0-9a-f]{40}$/i.test(doctorAddress)}>
                       <CloudUploadRoundedIcon style={{ color: 'white' }} />
                     </CustomButton>
               <CustomButton text='Doctor Register' handleClick={() => registerDoctor()}>

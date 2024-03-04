@@ -14,6 +14,7 @@ contract EHR{
 
   event HospitalAdded(address hospitalId);
   event DoctorAdded(address doctorId);
+  event DoctorProofAdded(address doctorId);
 
 
 
@@ -26,21 +27,34 @@ contract EHR{
   struct Doctor {
     address id;
     address hospitalId;
-    string proofCid;
+    Proof proofCID;
+  }
+
+  struct DoctorAccess{
+    address doctorId;
+    Permission[] permissions;
+  }
+
+
+  struct Proof{
+    string proofCID;
   }
 
   
   struct Hospital {
     address id;
     Doctor[] doctors;
+    Proof proofCID;
   }
 
   mapping (address => Doctor) public doctors;
   mapping (address => Hospital) public hospitals;
+  mapping (address => DoctorAccess) public doctorAccess;
 
    event RequestAdded(address patientId);
   event RecordAdded(string cid, address patientId, address doctorId); 
   event PatientAdded(address patientId);
+  event HospitalProofAdded(address hospitalId);
 
  
 
@@ -68,11 +82,14 @@ contract EHR{
     address doctorId;
     address personId;
     uint256 timeGiven;
+    bool access;
   }
 
   struct Permission{
     bool access;
+    address patientId;
     address doctorId;
+    address hospitalId;
   }
 
    struct Patient {
@@ -168,7 +185,7 @@ contract EHR{
 
   // ADMIN
 
-   function addDoctor(address _doctorId,address _hospitalId,string memory _cid) public checkAdmin {
+   function addDoctor(address _doctorId,address _hospitalId) public checkAdmin {
     require(doctors[_doctorId].id != _doctorId, "doc ex");
     doctors[_doctorId].id = _doctorId;
     require(hospitals[_hospitalId].id == _hospitalId, "hos no ex");
@@ -184,14 +201,20 @@ contract EHR{
     }
 
     require(!exists,"doc reg hos");
-    Doctor memory doctor = Doctor(_doctorId,_hospitalId,_cid);
+    Doctor memory doctor = Doctor(_doctorId,_hospitalId,doctors[_doctorId].proofCID);
     hospitals[_hospitalId].doctors.push(doctor);
 
 
     emit DoctorAdded(_doctorId);
   }
+  function addDoctorProof(address _doctorId,string memory _proofCID) public checkAdmin{
+    Proof memory proof = Proof(_proofCID);
+    doctors[_doctorId].proofCID = proof;
+
+    emit DoctorProofAdded(_doctorId);
+  }
     function getDoctor(address _doctorId) public view checkAdmin doctorExists(_doctorId) returns(Doctor memory){
-    Doctor memory doctor = Doctor(doctors[_doctorId].id,doctors[_doctorId].hospitalId,doctors[_doctorId].proofCid);
+    Doctor memory doctor = Doctor(doctors[_doctorId].id,doctors[_doctorId].hospitalId,doctors[_doctorId].proofCID);
     return doctor;
   }
    function addHospital(address _hospitalId) public checkAdmin{
@@ -200,9 +223,15 @@ contract EHR{
 
     emit HospitalAdded(_hospitalId);
   }
+    function addHospitalProof(address _hospitalId,string memory _proofCID) public checkAdmin{
+    Proof memory proof = Proof(_proofCID);
+    hospitals[_hospitalId].proofCID = proof;
+
+    emit HospitalProofAdded(_hospitalId);
+  }
    function getHospital(address _hospitalId) public view checkAdmin returns(Hospital memory){
     require(hospitals[_hospitalId].id == _hospitalId,"hos no ex");
-    Hospital memory hospital = Hospital(hospitals[_hospitalId].id,hospitals[_hospitalId].doctors);
+    Hospital memory hospital = Hospital(hospitals[_hospitalId].id,hospitals[_hospitalId].doctors,hospitals[_hospitalId].proofCID);
     return hospital;
   }
    function getHospitalExists(address _hospitalId) public view checkAdmin returns (bool) {
@@ -243,23 +272,25 @@ contract EHR{
 
 
    function requestAccess(address _patientId) public senderIsDoctor patientExists(_patientId){
-    Permission memory permission = Permission(false,msg.sender);
     bool exists = false;
     for(uint i = 0; i < patients[_patientId].permissions.length; i++){
-        if(patients[_patientId].permissions[i].doctorId == permission.doctorId){
+        if(patients[_patientId].permissions[i].doctorId == msg.sender){
           exists = true;
           break;
         }
     }
     require(!exists,"req ex");
+    Permission memory permission = Permission(false,_patientId,msg.sender,doctors[msg.sender].hospitalId);
+    doctorAccess[msg.sender].permissions.push(permission);
+    doctorAccess[msg.sender].doctorId = msg.sender;
     patients[_patientId].permissions.push(permission);
   
 
     emit RequestAdded(_patientId);
   }
 
-  function verifyDoctor(address _doctorId) public view senderIsPatient doctorExists(_doctorId) returns(string memory){
-    return doctors[_doctorId].proofCid;
+  function verifyDoctor(address _doctorId) public view senderIsPatient doctorExists(_doctorId) returns(Proof memory){
+    return doctors[_doctorId].proofCID;
   }
 
   function getRecordsDoctor(address _patientId) public view senderIsDoctor patientExists(_patientId) returns (Record[] memory){
@@ -278,6 +309,7 @@ contract EHR{
     for(uint i = 0; i < patients[msg.sender].permissions.length; i++){
       if(patients[msg.sender].permissions[i].doctorId == _doctorId){
         patients[msg.sender].permissions[i].access = _access;
+        doctorAccess[_doctorId].permissions[i].access = _access;
         break;
       }
     }
@@ -336,7 +368,7 @@ contract EHR{
     for(uint i = 0; i < patients[emergencyPerson[msg.sender].patientId].permissions.length; i++){
        if(patients[emergencyPerson[msg.sender].patientId].permissions[i].doctorId == _doctorId){
         patients[emergencyPerson[msg.sender].patientId].permissions[i].access = _access;
-        AccessHistory memory history = AccessHistory(_doctorId,msg.sender,block.timestamp);
+        AccessHistory memory history = AccessHistory(_doctorId,msg.sender,block.timestamp,_access);
         patients[emergencyPerson[msg.sender].patientId].accessHistory.push(history);
         break;
       }

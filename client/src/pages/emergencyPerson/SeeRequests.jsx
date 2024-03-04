@@ -6,6 +6,8 @@ import useEth from '../../contexts/EthContext/useEth'
 import RequestEmergency from '../../components/RequestEmergency'
 import useAlert from '../../contexts/AlertContext/useAlert'
 import EmergencyAccess from '../../components/access/emergencyAccess'
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 const SeeRequests = () => {
   const {
@@ -56,7 +58,7 @@ const SeeRequests = () => {
               {role === 'emergencyPerson' && (
                 <>
                   <Box mx={2}>
-                      <CustomButton text={'See Requests'} handleClick={() => getRequests()}>
+                      <CustomButton text={'See Requests'} startIcon={<VisibilityIcon/>} handleClick={() => getRequests()}>
                         <SearchRoundedIcon style={{ color: 'white' }} />
                       </CustomButton>
                     </Box>
@@ -70,7 +72,7 @@ const SeeRequests = () => {
                       ))}
                     </Box>
                     <Box mx={2}>
-                      <CustomButton text={'Close Requests'} handleClick={() => setViewRequest(false)}>
+                      <CustomButton text={'Close Requests'} startIcon={<VisibilityOffIcon/>} handleClick={() => setViewRequest(false)}>
                         <SearchRoundedIcon style={{ color: 'white' }} />
                       </CustomButton>
                     </Box>

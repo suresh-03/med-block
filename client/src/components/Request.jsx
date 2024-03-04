@@ -8,13 +8,16 @@ import SendIcon from '@mui/icons-material/Send';
 import Stack from '@mui/material/Stack';
 import useEth from '../contexts/EthContext/useEth'
 import useAlert from '../contexts/AlertContext/useAlert'
-import Proof from './Proof.jsx'
+import Proof from './Proof'
+import {useState} from 'react'
+import CheckIcon from '@mui/icons-material/Check';
 
 
 
 
 const Request = ({ request }) => {
-  const [access,doctorId] = request
+  const [access,doctorId,hospitalId] = request
+  const [doctorData,setDoctorData] = useState([])
 
    const {
     state: { contract, accounts, role, loading },
@@ -37,23 +40,15 @@ const Request = ({ request }) => {
       console.error(err);
     }
   }
-
-  const verifyProof = async () => {
-    try{
-    const doctorData = await contract.methods.verifyDoctor(doctorId).call({ form: accounts[0] })
-    if(doctorData != ''){
-      return(
-        <Proof proof={doctorData}/>
-        )
-    }
-    else{
-      setAlert("No proof found!",'error')
-    }
-  }
-  catch(err){
-    console.log(err)
-  }
-  }
+  const verifyDoctor = async () => {
+  try{
+  const doctorData = await contract.methods.verifyDoctor(doctorId).call({from:accounts[0]})
+  setDoctorData(doctorData)
+}
+catch(err){
+  console.error(err)
+}
+}
 
  
  
@@ -71,9 +66,17 @@ const Request = ({ request }) => {
           <Grid item xs={3}>
             <Box display='flex' flexDirection='column'>
               <Typography variant='h6' color={grey[600]}>
-                Request From
+                Doctor ID
               </Typography>
               <Typography variant='h6'>{doctorId}</Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={3}>
+            <Box display='flex' flexDirection='column'>
+              <Typography variant='h6' color={grey[600]}>
+                Hospital ID
+              </Typography>
+              <Typography variant='h6'>{hospitalId}</Typography>
             </Box>
           </Grid>
           
@@ -98,13 +101,24 @@ const Request = ({ request }) => {
       <Button variant="contained" color='success' value={doctorId} endIcon={<SendIcon />} onClick={(e) => givePermission(e.target.value,true)}>
         Accept
       </Button>
-      <Button variant="contained" color='primary'  endIcon={<SendIcon />} onClick={() => verifyProof()}>
-        Accept
+      <Button variant="contained" color='primary'  endIcon={<CheckIcon />} onClick={() => verifyDoctor()}>
+        Verify
       </Button>
     </Stack>
                 </Box>
             </Box>
           </Grid>
+            <Grid item xs={10}>
+            <Box display='flex' flexDirection='column'>
+              <Typography variant='h6' color={grey[600]}>
+                ID Proof
+              </Typography>
+              {doctorData.length != 0 && (
+              <Proof proof={doctorData}/>
+                )}
+            </Box>
+          </Grid>
+
         </Grid>
       </CardContent>
     </Card>
