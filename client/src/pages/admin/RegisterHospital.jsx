@@ -5,13 +5,19 @@ import PersonAddAlt1RoundedIcon from '@mui/icons-material/PersonAddAlt1Rounded'
 import CustomButton from '../../components/CustomButton'
 import { useNavigate } from 'react-router-dom'
 import useAlert from '../../contexts/AlertContext/useAlert'
-import { useState } from 'react'
+import { useState,useCallback } from 'react'
 import '../../App.css'
 import AdminAccess from '../../components/access/adminAccess'
+import AddRecordModal from '../doctor/AddRecordModal'
+import CryptoJS from 'crypto-js'
+import ipfs from '../../ipfs'
+import CloudUploadRoundedIcon from '@mui/icons-material/CloudUploadRounded'
+
 
 const RegisterHospital = () => {
 
 const [hospitalAddress,setHospitalAddress] = useState('')
+const [addRecord,setAddRecord] = useState(false)
 
 
   const {
@@ -20,6 +26,38 @@ const [hospitalAddress,setHospitalAddress] = useState('')
 
   const {setAlert} = useAlert()
   const navigate = useNavigate()
+
+  const addRecordCallback = useCallback(
+    async (buffer, fileName, patientAddress) => {
+      if (!patientAddress) {
+        setAlert('Please search for a patient first', 'error')
+        return
+      }
+      try {
+        const key = "oiewrhg5623475vbeihc39873948^&%E@ZfytfE#&@^ tf1wufhx231277!*YE2uygdwfyq64r%$Eyt324yrg"
+        const res = await ipfs.add(buffer)
+        const ipfsHashValue = res[0].hash
+        const ipfsBytes = CryptoJS.enc.Utf8.parse(ipfsHashValue);
+        var ipfsHash = CryptoJS.AES.encrypt(ipfsBytes, key).toString();        // Encryption: I: WordArray -> O: -> Base64 encoded string (OpenSSL)
+        // console.log(ipfsHash)
+        // console.log(ipfsHashValue)
+       
+
+        if (ipfsHash) {
+          await contract.methods.addHospitalProof(patientAddress,ipfsHash,fileName).send({from: accounts[0]})
+          setAlert('New Proof uploaded', 'success')
+          setAddRecord(true)
+
+          // refresh records
+        }
+        
+      } catch (err) {
+        setAlert('Proof upload failed', 'error')
+        console.error(err)
+      }
+    },
+    [hospitalAddress, accounts, contract]
+  )
 
   const registerHospital = async () => {
     try {
@@ -54,6 +92,9 @@ const [hospitalAddress,setHospitalAddress] = useState('')
       {role === 'admin' && (
           <div className='register-doctor'>
           <Box display='flex' flexDirection='column' alignItems='center'>
+            <Typography variant='h3' color='black' mb={5}>
+              Register Hospital
+            </Typography>
             {/*<Box mb={2}>*/}
                   <Box display='flex' alignItems='center' my={1}>
                     <FormControl fullWidth>
@@ -69,6 +110,16 @@ const [hospitalAddress,setHospitalAddress] = useState('')
                       />
                     </FormControl>
                   </Box>
+                  <Modal open={addRecord} onClose={() => setAddRecord(false)}>
+                    <AddRecordModal
+                      handleClose={() => setAddRecord(false)}
+                      handleUpload={addRecordCallback}
+                      patientAddress={hospitalAddress}
+                    />
+                  </Modal>
+                   <CustomButton text={'Add Proof'} handleClick={() => setAddRecord(true)} disabled={!/^(0x)?[0-9a-f]{40}$/i.test(hospitalAddress)}>
+                      <CloudUploadRoundedIcon style={{ color: 'white' }} />
+                    </CustomButton>
                 <CustomButton text='Hospital Register' handleClick={() => registerHospital()}>
                 <PersonAddAlt1RoundedIcon style={{ color: 'white' }} />
               </CustomButton>

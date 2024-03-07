@@ -8,21 +8,17 @@ import SendIcon from '@mui/icons-material/Send';
 import Stack from '@mui/material/Stack';
 import useEth from '../contexts/EthContext/useEth'
 import useAlert from '../contexts/AlertContext/useAlert'
-import {useState} from 'react'
 import Proof from './Proof'
+import {useState} from 'react'
 import CheckIcon from '@mui/icons-material/Check';
 
 
 
 
-
-
-const RequestEmergency = ({ requestEmergency }) => {
-  const [access,patientId,doctorId,hospitalId] = requestEmergency
-  const [doctorData,setDoctorData] = useState([])
-  const [hospitalData,setHospitalData] = useState([])
-  const [verifyDoctorClick,setVerifyDoctorClick] = useState(false)
-  const [verifyHospitalClick,setVerifyHospitalClick] = useState(false)
+const RequestEntity = ({ requestEntity }) => {
+  const [entityId,doctorId,access] = requestEntity
+  const [entityData,setEntityData] = useState([])
+  const [verifyEntityClick,setVerifyEntityClick] = useState(false)
 
    const {
     state: { contract, accounts, role, loading },
@@ -31,9 +27,9 @@ const RequestEmergency = ({ requestEmergency }) => {
   const {setAlert} = useAlert()
   // const [b64,setb64] = useState("")
 
-  const givePermission = async (doctorId,access) => {
+  const givePermission = async (entityId,access) => {
     try{
-      await contract.methods.giveEmergencyAccess(doctorId,access).send({ from: accounts[0] })
+      await contract.methods.grantResearchAccess(entityId,access).send({ from: accounts[0] })
       if(access){
         setAlert("request granted","success")
       }
@@ -42,30 +38,22 @@ const RequestEmergency = ({ requestEmergency }) => {
       }
 
     }catch(err){
-      console.error(err);
+      alert(err);
     }
   }
+  const verifyEntity = async () => {
+  try{
+  const entityData = await contract.methods.verifyResearchEntityProof(entityId).call({from:accounts[0]})
+  setEntityData(entityData)
+  setVerifyEntityClick(true)
+}
+catch(err){
+  console.error(err)
+}
+}
 
-   const verifyDoctor = async () => {
-  try{
-  const doctorData = await contract.methods.verifyDoctor(doctorId).call({from:accounts[0]})
-  setDoctorData(doctorData)
-  setVerifyDoctorClick(true)
-}
-catch(err){
-  console.error(err)
-}
-}
-  const verifyHospital = async () => {
-  try{
-  const hospitalData = await contract.methods.verifyHospital(hospitalId).call({from:accounts[0]})
-  setHospitalData(hospitalData)
-  setVerifyHospitalClick(true)
-}
-catch(err){
-  console.error(err)
-}
-}
+
+ 
  
 
 
@@ -78,23 +66,24 @@ catch(err){
           <Grid item xs={1}>
             <DescriptionRoundedIcon style={{ fontSize: 40, color: grey[700] }} />
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={5}>
             <Box display='flex' flexDirection='column'>
               <Typography variant='h6' color={grey[600]}>
-                Request From
+                Research Entity ID
+              </Typography>
+              <Typography variant='h6'>{entityId}</Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={5}>
+            <Box display='flex' flexDirection='column'>
+              <Typography variant='h6' color={grey[600]}>
+                Doctor ID
               </Typography>
               <Typography variant='h6'>{doctorId}</Typography>
             </Box>
           </Grid>
-          <Grid item xs={4}>
-            <Box display='flex' flexDirection='column'>
-              <Typography variant='h6' color={grey[600]}>
-                Hospital ID
-              </Typography>
-              <Typography variant='h6'>{hospitalId}</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={10}>
+          
+           <Grid item xs={10}>
             <Box display='flex' flexDirection='column'>
               <Typography variant='h6' color={grey[600]}>
                 Access
@@ -109,17 +98,14 @@ catch(err){
               </Typography>
                <Box mx={2} display='flex' flexDirection='row'>
                       <Stack direction="row" spacing={2}>
-      <Button variant="contained" color='error' value={doctorId} startIcon={<DeleteIcon />} onClick={(e) => givePermission(e.target.value,false)}>
+      <Button variant="contained" color='error' value={entityId} startIcon={<DeleteIcon />} onClick={(e) => givePermission(e.target.value,false)}>
         Reject
       </Button>
-      <Button variant="contained" color='success' value={doctorId} endIcon={<SendIcon />} onClick={(e) => givePermission(e.target.value,true)}>
+      <Button variant="contained" color='success' value={entityId} endIcon={<SendIcon />} onClick={(e) => givePermission(e.target.value,true)}>
         Accept
       </Button>
-      <Button variant="contained" color='primary'  endIcon={<CheckIcon />} onClick={() => verifyDoctor()}>
-        Verify Doctor
-      </Button>
-       <Button variant="contained" color='primary'  endIcon={<CheckIcon />} onClick={() => verifyHospital()}>
-        Verify Hospital
+      <Button variant="contained" color='primary'  endIcon={<CheckIcon />} onClick={() => verifyEntity()}>
+        Verify Entity
       </Button>
     </Stack>
                 </Box>
@@ -128,25 +114,12 @@ catch(err){
             <Grid item xs={10}>
             <Box display='flex' flexDirection='column'>
               <Typography variant='h6' color={grey[600]}>
-                Doctor ID Proof
+                Entity ID Proof
               </Typography>
-              {doctorData.length != 0 && verifyDoctorClick && (
-              <Proof proof={doctorData}/>
+              {entityData.length != 0 && verifyEntityClick && (
+              <Proof proof={entityData}/>
                 )}
-              {doctorData.length == 0 && verifyDoctorClick && (
-                setAlert('No Proof Exists','error')
-                )}
-            </Box>
-          </Grid>
-          <Grid item xs={10}>
-            <Box display='flex' flexDirection='column'>
-              <Typography variant='h6' color={grey[600]}>
-                Hospital ID Proof
-              </Typography>
-               {hospitalData.length != 0 && verifyHospitalClick && (
-              <Proof proof={hospitalData}/>
-                )}
-              {hospitalData.length == 0 && verifyHospitalClick && (
+              {entityData.length == 0 && verifyEntityClick && (
                 setAlert('No Proof Exists','error')
                 )}
             </Box>
@@ -162,4 +135,4 @@ catch(err){
 }
 
 
-export default RequestEmergency
+export default RequestEntity

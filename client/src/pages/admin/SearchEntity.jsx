@@ -7,43 +7,43 @@ import useEth from '../../contexts/EthContext/useEth'
 import PersonAddAlt1RoundedIcon from '@mui/icons-material/PersonAddAlt1Rounded'
 import useAlert from '../../contexts/AlertContext/useAlert'
 import CloudUploadRoundedIcon from '@mui/icons-material/CloudUploadRounded'
-import Doctor from '../../components/Doctor'
+import ResearchEntity from '../../components/ResearchEntity'
 import AdminAccess from '../../components/access/adminAccess'
 
 
 
 
 
-const SearchDoctor = () => {
+const SearchEntity = () => {
   const {
     state: { contract, accounts, role, loading },
   } = useEth()
   const { setAlert } = useAlert()
 
-  const [doctorExist, setDoctorExist] = useState(false)
-  const [searchDoctorAddress, setSearchDoctorAddress] = useState('')
-  const [doctorDetails,setDoctorDetails] = useState([])
+  const [entityExist, setEntityExist] = useState(false)
+  const [searchEntityAddress, setSearchEntityAddress] = useState('')
+  const [entityDetails,setEntityDetails] = useState([])
   
   
 
-  const searchDoctor = async () => {
+  const searchEntity = async () => {
     try {
-      if (!/^(0x)?[0-9a-f]{40}$/i.test(searchDoctorAddress)) {
+      if (!/^(0x)?[0-9a-f]{40}$/i.test(searchEntityAddress)) {
         setAlert('Please enter a valid wallet address', 'error')
         return
       }
-      const doctorExists = await contract.methods.getDoctorExists(searchDoctorAddress).call({ from: accounts[0] })
-      if (doctorExists) {
-        setDoctorExist(true)
+      const entityExists = await contract.methods.getResearchEntityExists(searchEntityAddress).call({ from: accounts[0] })
+      if (entityExists) {
+        setEntityExist(true)
     
         
         // setAlert("you have access","success")
-        const doctorDetails = await contract.methods.getDoctor(searchDoctorAddress).call({ from: accounts[0] })
-        console.log(' details :>> ', doctorDetails)
-        setDoctorDetails(doctorDetails)
+        const entityDetails = await contract.methods.getResearchEntity(searchEntityAddress).call({ from: accounts[0] })
+        console.log(' details :>> ', entityDetails)
+        setEntityDetails(entityDetails)
       }
       else{
-        setAlert("Doctor not exist, register doctor!","error")
+        setAlert("Entity not exist, register Entity!","error")
         // setAccess(false)
 
       }
@@ -75,37 +75,37 @@ const SearchDoctor = () => {
               {role === 'admin' && (
                 <>
 
-                  <Typography variant='h4'>Doctor Details</Typography>
+                  <Typography variant='h4'>Research Entity Details</Typography>
                   <Box display='flex' alignItems='center' my={1}>
                     <FormControl fullWidth>
                       <TextField
                         variant='outlined'
-                        placeholder='Search Doctor by wallet address'
-                        value={searchDoctorAddress}
-                        onChange={e => setSearchDoctorAddress(e.target.value)}
+                        placeholder='Search Entity by wallet address'
+                        value={searchEntityAddress}
+                        onChange={e => setSearchEntityAddress(e.target.value)}
                         InputProps={{ style: { fontSize: '15px' } }}
                         InputLabelProps={{ style: { fontSize: '15px' } }}
                         size='small'
                       />
                     </FormControl>
                     <Box mx={2}>
-                      <CustomButton text={'Search'} handleClick={() => {searchDoctor()}}>
+                      <CustomButton text={'Search'} handleClick={() => {searchEntity()}}>
                         <SearchRoundedIcon style={{ color: 'white' }} />
                       </CustomButton>
                     </Box>
                   </Box>
 
-                  {doctorExist && doctorDetails.length === 0 && (
+                  {entityExist && entityDetails.length === 0 && (
                     <Box display='flex' alignItems='center' justifyContent='center' my={5}>
                       <Typography variant='h5'>No records found</Typography>
                     </Box>
                   )}
 
-                  {doctorExist && doctorDetails.length > 0 && (
+                  {entityExist && entityDetails.length > 0 && (
                     <Box display='flex' flexDirection='column' mt={3} mb={-2}>
                       
                         <Box mb={2}>
-                          <Doctor  doctor={doctorDetails}/>
+                          <ResearchEntity  entity={entityDetails}/>
                         </Box>
                       
                     </Box>
@@ -121,4 +121,4 @@ const SearchDoctor = () => {
   }
 }
 
-export default SearchDoctor
+export default SearchEntity

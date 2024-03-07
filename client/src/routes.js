@@ -18,6 +18,10 @@ import GiveEmergencyAccess from './pages/patient/GiveEmergencyAccess'
 import ViewEmergencyAccess from './pages/patient/ViewEmergencyAccess'
 import SeeRequests from './pages/emergencyPerson/SeeRequests'
 import EmergencyHistory from './pages/patient/EmergencyHistory'
+import RegisterEntity from './pages/admin/RegisterEntity'
+import SearchEntity from './pages/admin/SearchEntity'
+import ViewEntityRequest from './pages/doctor/ViewEntityRequest'
+import SearchRecords from './pages/researchEntity/SearchRecords'
 
 const routes = [
   {
@@ -82,8 +86,38 @@ const routes = [
           </>
         ),
       },
+       {
+        path: 'admin/registerEntity',
+        element: (
+          <>
+            <HeaderAppBar />
+            <AlertPopup />
+            <RegisterEntity />
+          </>
+        ),
+      },
+       {
+        path: 'admin/searchEntity',
+        element: (
+          <>
+            <HeaderAppBar />
+            <AlertPopup />
+            <SearchEntity />
+          </>
+        ),
+      },
       {
         path: 'patient',
+        element: (
+          <>
+            <HeaderAppBar />
+            <AlertPopup />
+            <Patient />
+          </>
+        ),
+      },
+       {
+        path: 'patient/myRecords',
         element: (
           <>
             <HeaderAppBar />
@@ -153,12 +187,32 @@ const routes = [
         ),
       },
       {
+        path: 'doctor/viewEntityRequest',
+        element: (
+          <>
+            <HeaderAppBar />
+            <AlertPopup />
+            <ViewEntityRequest />
+          </>
+        ),
+      },
+      {
        path: 'emergencyPerson/seeRequests',
         element: (
           <>
             <HeaderAppBar />
             <AlertPopup />
             <SeeRequests />
+          </>
+        ),
+      },
+       {
+       path: 'researchEntity/searchRecords',
+        element: (
+          <>
+            <HeaderAppBar />
+            <AlertPopup />
+            <SearchRecords />
           </>
         ),
       },

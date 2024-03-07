@@ -4,63 +4,47 @@ pragma solidity ^0.8.0;
 
 contract EHR{ 
 
-// COMMON
-  modifier senderExists {
-    require(doctors[msg.sender].id == msg.sender || patients[msg.sender].id == msg.sender, "Sen no ex");
-    _;
-  }
-  // ADMIN
-   address public constant ADMINID = 0xe30e325e0da4338B992999388145566a36D0fe6B;
-
-  event HospitalAdded(address hospitalId);
-  event DoctorAdded(address doctorId);
-  event DoctorProofAdded(address doctorId);
-
-
-
-
-   modifier checkAdmin {
-    require(msg.sender == ADMINID, "Sen no ad");
-    _;
-  }
-  // DOCTOR
+    // DOCTOR
   struct Doctor {
     address id;
     address hospitalId;
     Proof proofCID;
   }
-
-  struct DoctorAccess{
-    address doctorId;
-    Permission[] permissions;
+   struct DoctorPatients{
+    address[] patientAddress;
   }
 
+  struct ResearchPermission{
+    address researchEntityId;
+    address doctorId;
+    bool access;
+  }
+
+  struct DoctorRequest{
+    ResearchPermission[] researchPermissions;
+  }
+
+  // RESEARCH ENTITY 
+
+  struct ResearchEntity{
+    address id;
+    Proof proofCID;
+  }
+
+ 
+  // PROOF
 
   struct Proof{
     string proofCID;
+    string fileName;
   }
 
+  // HOSPITAL
   
   struct Hospital {
     address id;
     Doctor[] doctors;
     Proof proofCID;
-  }
-
-  mapping (address => Doctor) public doctors;
-  mapping (address => Hospital) public hospitals;
-  mapping (address => DoctorAccess) public doctorAccess;
-
-   event RequestAdded(address patientId);
-  event RecordAdded(string cid, address patientId, address doctorId); 
-  event PatientAdded(address patientId);
-  event HospitalProofAdded(address hospitalId);
-
- 
-
-  modifier senderIsDoctor {
-    require(doctors[msg.sender].id == msg.sender, "Sen no doc");
-    _;
   }
 
   // PATIENT
@@ -71,6 +55,8 @@ contract EHR{
     address doctorId;
     uint256 timeAdded;
   }
+
+  // EMERGENCY PERSON
 
   struct EmergencyAccess{
     address id;
@@ -100,31 +86,65 @@ contract EHR{
     AccessHistory[] accessHistory;
   }
 
-  mapping (address => Patient) public patients;
-  mapping (address => EmergencyAccess) public emergencyPerson;
 
+  // ADMIN
+   address private constant ADMINID = 0xe30e325e0da4338B992999388145566a36D0fe6B;
 
+  
+  // EVENTS
+
+  event HospitalAdded(address hospitalId);
+  event DoctorAdded(address doctorId);
+  event DoctorProofAdded(address doctorId);
+  event RequestAdded(address patientId);
+  event RecordAdded(string cid, address patientId, address doctorId); 
+  event PatientAdded(address patientId);
+  event HospitalProofAdded(address hospitalId);
   event EmergencyAdded(address personId);
   event manageEmergency(address personId);
   event AccessGranted(address doctorId);
   event EmergencyAccessGranted(address doctorId);
+  event ResearchEntityAdded(address researchEntityId);
+  event ResearchEntityProofAdded(address researchEntityId);
+  event ResearchRequestAdded(address doctorId);
+  event ResearchAccessGranted(address researchEntityId);
+
+  // MAPPING
+
+  mapping (address => Doctor) public doctors;
+  mapping (address => Hospital) public hospitals;
+  mapping (address => Patient) public patients;
+  mapping (address => EmergencyAccess) public emergencyPerson;
+  mapping (address => DoctorPatients)  doctorPatients;
+  mapping (address => ResearchEntity) public researchEntity;
+  mapping (address => DoctorRequest)  doctorRequest;
 
 
+
+  // ADMIN
+   modifier checkAdmin {
+    require(msg.sender == ADMINID, "Sen no ad");
+    _;
+  }
+
+ // COMMON
+  modifier senderExists {
+    require(doctors[msg.sender].id == msg.sender || patients[msg.sender].id == msg.sender, "Sen no ex");
+    _;
+  }
+
+ // PATIENT
   
-
+   modifier senderIsPatient{
+    require(patients[msg.sender].id == msg.sender, "Sen no pat");
+    _;
+  }
 
    modifier patientExists(address patientId) {
     require(patients[patientId].id == patientId, "No Pat");
     _;
   }
-  // doctor modifier
-  modifier doctorExists(address doctorId) {
-    require(doctors[doctorId].id == doctorId, "Doc no ex");
-    _;
-  }
-
-
-  modifier checkAccess(address patientId){
+    modifier checkAccess(address patientId){
     bool access = false;
     for(uint i = 0; i < patients[patientId].permissions.length; i++){
       Permission memory permission = patients[patientId].permissions[i];
@@ -140,12 +160,32 @@ contract EHR{
     _;
   }
 
+  // DOCTOR
 
-   modifier senderIsPatient{
-    require(patients[msg.sender].id == msg.sender, "Sen no pat");
+  modifier doctorExists(address doctorId) {
+    require(doctors[doctorId].id == doctorId, "Doc no ex");
     _;
   }
-  // Emergency Person modifier
+   modifier senderIsDoctor {
+    require(doctors[msg.sender].id == msg.sender, "Sen no doc");
+    _;
+  }
+
+  // HOSPITAL
+
+  modifier hospitalExists(address hospitalId){
+    require(hospitals[hospitalId].id == hospitalId,'hos no ex');
+    _;
+  }
+
+  modifier senderIsHospital{
+    require(hospitals[msg.sender].id == msg.sender,'Sen no hos');
+    _;
+  }
+
+
+  // EMERGENCY PERSON
+
    modifier personExists(address personId){
     require(emergencyPerson[personId].id == personId,"No Per");
     _;
@@ -166,7 +206,20 @@ contract EHR{
     require(exists,"No Eme acc");
     _;
   }
-  // functions
+
+  // RESEARCH ENTITY
+
+  modifier senderIsResearchEntity{
+    require(researchEntity[msg.sender].id == msg.sender,'sen no res');
+    _;
+  }
+
+  modifier researchEntityExists(address researchEntityId){
+    require(researchEntity[researchEntityId].id == researchEntityId,'res no ex');
+    _;
+  }
+  // FUNCTIONS
+
   function getSenderRole() public view returns (string memory) {
     if (doctors[msg.sender].id == msg.sender) {
       return "doctor";
@@ -178,7 +231,9 @@ contract EHR{
       return "hospital";
     } else if(emergencyPerson[msg.sender].id == msg.sender){
       return "emergencyPerson";
-    } else {
+    } else if(researchEntity[msg.sender].id == msg.sender){
+      return "researchEntity";
+    }else {
       return "unknown";
     }
   }
@@ -207,8 +262,8 @@ contract EHR{
 
     emit DoctorAdded(_doctorId);
   }
-  function addDoctorProof(address _doctorId,string memory _proofCID) public checkAdmin{
-    Proof memory proof = Proof(_proofCID);
+  function addDoctorProof(address _doctorId,string memory _proofCID,string memory _fileName) public checkAdmin{
+    Proof memory proof = Proof(_proofCID,_fileName);
     doctors[_doctorId].proofCID = proof;
 
     emit DoctorProofAdded(_doctorId);
@@ -217,14 +272,17 @@ contract EHR{
     Doctor memory doctor = Doctor(doctors[_doctorId].id,doctors[_doctorId].hospitalId,doctors[_doctorId].proofCID);
     return doctor;
   }
+    function getDoctorExists(address _doctorId) public view returns (bool) {
+    return doctors[_doctorId].id == _doctorId;
+  }
    function addHospital(address _hospitalId) public checkAdmin{
     require(hospitals[_hospitalId].id != _hospitalId,"hos ex");
     hospitals[_hospitalId].id = _hospitalId;
 
     emit HospitalAdded(_hospitalId);
   }
-    function addHospitalProof(address _hospitalId,string memory _proofCID) public checkAdmin{
-    Proof memory proof = Proof(_proofCID);
+    function addHospitalProof(address _hospitalId,string memory _proofCID,string memory _fileName) public checkAdmin{
+    Proof memory proof = Proof(_proofCID,_fileName);
     hospitals[_hospitalId].proofCID = proof;
 
     emit HospitalProofAdded(_hospitalId);
@@ -237,9 +295,27 @@ contract EHR{
    function getHospitalExists(address _hospitalId) public view checkAdmin returns (bool) {
     return hospitals[_hospitalId].id == _hospitalId;
   }
-   function getDoctorExists(address _doctorId) public view checkAdmin returns (bool) {
-    return doctors[_doctorId].id == _doctorId;
+
+  function addResearchEntity(address _researchEntityId) public checkAdmin{
+    require(researchEntity[_researchEntityId].id != _researchEntityId,'res al ex');
+    researchEntity[_researchEntityId].id = _researchEntityId;
+
+    emit ResearchEntityAdded(_researchEntityId);
   }
+  function addResearchEntityProof(address _researchEntityId,string memory _proofCID,string memory _fileName) public checkAdmin{
+    Proof memory proof = Proof(_proofCID,_fileName);
+    researchEntity[_researchEntityId].proofCID = proof;
+
+    emit ResearchEntityProofAdded(_researchEntityId);
+  }
+   function getResearchEntity(address _researchEntityId) public view checkAdmin researchEntityExists(_researchEntityId) returns(ResearchEntity memory){
+    ResearchEntity memory research = ResearchEntity(researchEntity[_researchEntityId].id,researchEntity[_researchEntityId].proofCID);
+    return research;
+  }
+     function getResearchEntityExists(address _researchEntityId) public view checkAdmin returns (bool) {
+    return researchEntity[_researchEntityId].id == _researchEntityId;
+  }
+ 
 
   // DOCTOR
   function verifyAccess(address _patientId,address _doctorId) public view senderIsDoctor patientExists(_patientId) returns (bool){
@@ -258,6 +334,16 @@ contract EHR{
   function addPatient(address _patientId) public senderIsDoctor{
     require(patients[_patientId].id != _patientId, "pat ex");
     patients[_patientId].id = _patientId;
+    bool exists = false;
+    for(uint i = 0; i < doctorPatients[msg.sender].patientAddress.length; i++){
+      if(doctorPatients[msg.sender].patientAddress[i] == _patientId){
+        exists = true;
+        break;
+      }
+    }
+    if(!exists){
+      doctorPatients[msg.sender].patientAddress.push(_patientId);
+    }
 
 
     emit PatientAdded(_patientId);
@@ -281,17 +367,12 @@ contract EHR{
     }
     require(!exists,"req ex");
     Permission memory permission = Permission(false,_patientId,msg.sender,doctors[msg.sender].hospitalId);
-    doctorAccess[msg.sender].permissions.push(permission);
-    doctorAccess[msg.sender].doctorId = msg.sender;
     patients[_patientId].permissions.push(permission);
   
 
     emit RequestAdded(_patientId);
   }
 
-  function verifyDoctor(address _doctorId) public view senderIsPatient doctorExists(_doctorId) returns(Proof memory){
-    return doctors[_doctorId].proofCID;
-  }
 
   function getRecordsDoctor(address _patientId) public view senderIsDoctor patientExists(_patientId) returns (Record[] memory){
     return patients[_patientId].records;
@@ -299,6 +380,26 @@ contract EHR{
     function getPatientExists(address _patientId) public view senderIsDoctor returns (bool) {
     return patients[_patientId].id == _patientId;
   }
+     function getResearchRequests() public view doctorExists(msg.sender) senderIsDoctor returns (ResearchPermission[] memory){
+    return doctorRequest[msg.sender].researchPermissions;
+  }
+
+  function verifyResearchEntityProof(address _researchEntityId) public view senderIsDoctor researchEntityExists(_researchEntityId) returns (Proof memory){
+    return researchEntity[_researchEntityId].proofCID;
+  }
+
+  function grantResearchAccess(address _researchEntityId,bool _access) public senderIsDoctor researchEntityExists(_researchEntityId){
+    for(uint i = 0; i < doctorRequest[msg.sender].researchPermissions.length; i++){
+      if(doctorRequest[msg.sender].researchPermissions[i].researchEntityId == _researchEntityId){
+        doctorRequest[msg.sender].researchPermissions[i].access = _access;
+        break;
+      }
+    }
+
+    emit ResearchAccessGranted(_researchEntityId);
+  }
+
+
 // PATIENT
 
   function getRequests(address _patientId) public view patientExists(_patientId) senderIsPatient returns (Permission[] memory){
@@ -309,7 +410,6 @@ contract EHR{
     for(uint i = 0; i < patients[msg.sender].permissions.length; i++){
       if(patients[msg.sender].permissions[i].doctorId == _doctorId){
         patients[msg.sender].permissions[i].access = _access;
-        doctorAccess[_doctorId].permissions[i].access = _access;
         break;
       }
     }
@@ -338,7 +438,7 @@ contract EHR{
 
   }
 
-  function getRecords(address _patientId) public view patientExists(_patientId) returns (Record[] memory) {
+  function getRecords(address _patientId) public view senderExists patientExists(_patientId) returns (Record[] memory) {
     return patients[_patientId].records;
   } 
 
@@ -361,6 +461,13 @@ contract EHR{
 
     emit manageEmergency(_personId);
   }
+    function verifyDoctor(address _doctorId) public view  doctorExists(_doctorId) returns(Proof memory){
+    return doctors[_doctorId].proofCID;
+  }
+    function verifyHospital(address _hospitalId) public view  hospitalExists(_hospitalId) returns(Proof memory){
+    return hospitals[_hospitalId].proofCID;
+  }
+ 
 
    // EMERGENCY PERSON
   
@@ -381,6 +488,52 @@ contract EHR{
   }
   function getPatientIdEmergency() public view senderIsEmergencyAccess returns(address){
     return emergencyPerson[msg.sender].patientId;
+  }
+
+  // RESEARCH ENTITY
+
+  function giveResearchRequest(address _doctorId) public senderIsResearchEntity doctorExists(_doctorId){
+    bool exists = false;
+    for(uint i = 0; i < doctorRequest[_doctorId].researchPermissions.length; i++){
+      if(doctorRequest[_doctorId].researchPermissions[i].researchEntityId == msg.sender){
+        exists = true;
+        break;
+      }
+    }
+    require(!exists,'req al ex');
+    ResearchPermission memory researchPermission = ResearchPermission(msg.sender,_doctorId,false);
+    doctorRequest[_doctorId].researchPermissions.push(researchPermission);
+
+    emit ResearchRequestAdded(_doctorId);
+  }
+
+  function researchAccessRecords(address _doctorId) public view senderIsResearchEntity returns(Record[][] memory){
+    Record[][] memory records = new Record[][](doctorPatients[_doctorId].patientAddress.length);
+    uint index = 0;
+    for(uint i = 0; i < doctorPatients[_doctorId].patientAddress.length; i++){
+      for(uint j = 0; j < patients[doctorPatients[_doctorId].patientAddress[i]].permissions.length; j++){
+        if(patients[doctorPatients[_doctorId].patientAddress[i]].permissions[i].doctorId == _doctorId){
+          if(patients[doctorPatients[_doctorId].patientAddress[i]].permissions[i].access == true){
+            records[index] = patients[doctorPatients[_doctorId].patientAddress[i]].records;
+            index++;
+            break;
+          }
+        }
+      }
+    }
+    return records;
+  }
+    function verifyResearchAccess(address _doctorId) public view senderIsResearchEntity doctorExists(_doctorId) returns (bool){
+     bool access = false;
+    for(uint i = 0; i < doctorRequest[_doctorId].researchPermissions.length; i++){
+      if(doctorRequest[_doctorId].researchPermissions[i].researchEntityId == msg.sender){
+        if(doctorRequest[_doctorId].researchPermissions[i].access == true){
+        access = true;
+        break;
+      }
+      }
+    }
+    return access;
   }
 
   

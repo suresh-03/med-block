@@ -16,8 +16,12 @@ import CheckIcon from '@mui/icons-material/Check';
 
 
 const Request = ({ request }) => {
-  const [access,doctorId,hospitalId] = request
-  const [doctorData,setDoctorData] = useState([])
+  const [access,patientId,doctorId,hospitalId] = request
+  const [doctorData,setDoctorData] = useState('')
+  const [hospitalData,setHospitalData] = useState([])
+  const [verifyDoctorClick,setVerifyDoctorClick] = useState(false)
+  const [verifyHospitalClick,setVerifyHospitalClick] = useState(false)
+
 
    const {
     state: { contract, accounts, role, loading },
@@ -44,6 +48,19 @@ const Request = ({ request }) => {
   try{
   const doctorData = await contract.methods.verifyDoctor(doctorId).call({from:accounts[0]})
   setDoctorData(doctorData)
+  setVerifyDoctorClick(true)
+}
+catch(err){
+  console.error(err)
+}
+}
+
+  const verifyHospital = async () => {
+  try{
+  const hospitalData = await contract.methods.verifyHospital(hospitalId).call({from:accounts[0]})
+  setHospitalData(hospitalData)
+  setVerifyHospitalClick(true)
+
 }
 catch(err){
   console.error(err)
@@ -63,7 +80,7 @@ catch(err){
           <Grid item xs={1}>
             <DescriptionRoundedIcon style={{ fontSize: 40, color: grey[700] }} />
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={4}>
             <Box display='flex' flexDirection='column'>
               <Typography variant='h6' color={grey[600]}>
                 Doctor ID
@@ -71,7 +88,7 @@ catch(err){
               <Typography variant='h6'>{doctorId}</Typography>
             </Box>
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={4}>
             <Box display='flex' flexDirection='column'>
               <Typography variant='h6' color={grey[600]}>
                 Hospital ID
@@ -102,7 +119,10 @@ catch(err){
         Accept
       </Button>
       <Button variant="contained" color='primary'  endIcon={<CheckIcon />} onClick={() => verifyDoctor()}>
-        Verify
+        Verify Doctor
+      </Button>
+      <Button variant="contained" color='primary'  endIcon={<CheckIcon />} onClick={() => verifyHospital()}>
+        Verify Hospital
       </Button>
     </Stack>
                 </Box>
@@ -111,10 +131,27 @@ catch(err){
             <Grid item xs={10}>
             <Box display='flex' flexDirection='column'>
               <Typography variant='h6' color={grey[600]}>
-                ID Proof
+                Doctor ID Proof
               </Typography>
-              {doctorData.length != 0 && (
+              {doctorData.length != 0 && verifyDoctorClick && (
               <Proof proof={doctorData}/>
+                )}
+              {doctorData.length == 0 && verifyDoctorClick && (
+                setAlert("No Proof Exists",'error')
+              
+                )}
+            </Box>
+          </Grid>
+           <Grid item xs={10}>
+            <Box display='flex' flexDirection='column'>
+              <Typography variant='h6' color={grey[600]}>
+                Hospital ID Proof
+              </Typography>
+              {hospitalData.length != 0 && verifyHospitalClick && (
+              <Proof proof={hospitalData}/>
+                )}
+              {hospitalData.length == 0 && verifyHospitalClick && (
+                setAlert("No Proof Exists",'error')
                 )}
             </Box>
           </Grid>

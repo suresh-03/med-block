@@ -10,7 +10,8 @@ import CustomButton from './CustomButton'
 
 
 const Proof = ({ proof }) => {
-  const [proofCID] = proof
+  const [proofCID,filename] = proof
+  // alert(proofCID)
   // const [b64,setb64] = useState("")
 
   function convertWordArrayToUint8Array(wordArray) {
@@ -32,26 +33,28 @@ const Proof = ({ proof }) => {
       try {
         alert('Encrypted Content Identifier(CID):\n\n'+proofCID)
         const keyCID = "oiewrhg5623475vbeihc39873948^&%E@ZfytfE#&@^ tf1wufhx231277!*YE2uygdwfyq64r%$Eyt324yrg"
-       const decryptedBytes = CryptoJS.AES.decrypt(proofCID, keyCID);
-        const decryptedCID = decryptedBytes.toString(CryptoJS.enc.Utf8); 
-        console.log(decryptedCID)             // Decryption: I: Base64 encoded string (OpenSSL-format) -> O: WordArray
+       const decryptedBytes = await CryptoJS.AES.decrypt(proofCID, keyCID);
+        const decryptedCID = await decryptedBytes.toString(CryptoJS.enc.Utf8);              // Decryption: I: Base64 encoded string (OpenSSL-format) -> O: WordArray
         const response = await fetch(`https://med-chain.infura-ipfs.io/ipfs/${decryptedCID}`);
-        console.log(response)
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
           const key = "askfalq234234123kl4jlkfjalkdsfjq4j!@#LK%Ds#";
          const textData = await response.text()
-       var decrypted = CryptoJS.AES.decrypt(textData, key);               // Decryption: I: Base64 encoded string (OpenSSL-format) -> O: WordArray
-        var typedArray = convertWordArrayToUint8Array(decrypted);               // Convert: WordArray -> typed array
+        
+       var decrypted = await CryptoJS.AES.decrypt(textData, key);               // Decryption: I: Base64 encoded string (OpenSSL-format) -> O: WordArray
+        var typedArray = await convertWordArrayToUint8Array(decrypted); 
+        
 
         var fileDec = new Blob([typedArray]);
+                     // Convert: WordArray -> typed array
+
 
         var a = document.createElement("a");
         var url = window.URL.createObjectURL(fileDec);
-        var filename = "proof";
+        var fileName = filename;
         a.href = url;
-        // a.download = filename;
+        a.download = fileName;
         a.click();
         window.URL.revokeObjectURL(url);
 
@@ -64,7 +67,6 @@ const Proof = ({ proof }) => {
       }
     };
 
-
   return (
     <Card>
       <CardContent>
@@ -72,7 +74,13 @@ const Proof = ({ proof }) => {
           <Grid item xs={1}>
             <DescriptionRoundedIcon style={{ fontSize: 40, color: grey[700] }} />
           </Grid>
-          <Grid item xs={1}>
+          <Grid item xs={3}>
+            <Typography variant='h6' color={grey[600]}>
+                Participant Proof
+              </Typography>
+              <Typography variant='h6'>{filename}</Typography>
+          </Grid>
+          <Grid item xs={9}>
             <CustomButton handleClick={() => fetchData()}>
                       <CloudDownloadRoundedIcon style={{ color: 'white' }} />
             </CustomButton>

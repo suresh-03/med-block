@@ -109,13 +109,13 @@ const SearchHospital = () => {
                           <Hospital  hospital={hospitalDetails}/>
                         </Box>
                     </Box>
-                    {hospitalDetails[hospitalDetails.length-1].length > 0 && (
+                    {hospitalDetails[hospitalDetails.length-2].length > 0 && (
                       <>
                       <Box display='flex' alignItems='center' justifyContent='center' my={5}>
-                      <Typography variant='h5'>{hospitalDetails[hospitalDetails.length-1].length} Doctors found</Typography>
+                      <Typography variant='h5'>{hospitalDetails[hospitalDetails.length-2].length} Doctors found</Typography>
                     </Box>
                         <Box display='flex' flexDirection='column' mt={3} mb={-2}>
-                         {hospitalDetails[hospitalDetails.length-1].map((doctor, index) => (
+                         {hospitalDetails[hospitalDetails.length-2].map((doctor, index) => (
                         <Box mb={2}>
                           <Doctor key={index} doctor={doctor} />
                         </Box>
@@ -124,7 +124,7 @@ const SearchHospital = () => {
                     </>
 
                       )}
-                    {hospitalDetails[hospitalDetails.length-1].length == 0 && (
+                    {hospitalDetails[hospitalDetails.length-2].length == 0 && (
 
                       <Box display='flex' alignItems='center' justifyContent='center' my={5}>
                       <Typography variant='h5'>No Doctors found</Typography>

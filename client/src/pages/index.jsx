@@ -103,6 +103,12 @@ const Home = () => {
             <LoginRoundedIcon style={{ color: 'white' }} />
           </CustomButton>
         )
+      }else if (role === 'researchEntity') {
+        return (
+          <CustomButton text='Research Entity Portal' handleClick={() => navigate('/researchEntity/searchRecords')}>
+            <LoginRoundedIcon style={{ color: 'white' }} />
+          </CustomButton>
+        )
       }else{
         return (
           <>

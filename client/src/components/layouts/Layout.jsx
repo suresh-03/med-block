@@ -26,6 +26,9 @@ const HeaderAppBar = () => {
                <a className='register-patient-nav' href='/doctor' style={{marginLeft:20}}>
              Search Patient
               </a>
+               <a className='register-patient-nav' href='/doctor/viewEntityRequest' style={{marginLeft:20}}>
+             Entity Requests
+              </a>
               </>
             )}
            {role === 'admin' && (
@@ -42,11 +45,20 @@ const HeaderAppBar = () => {
                <a className='register-patient-nav' href='/admin/searchHospital' style={{marginLeft:20}} >
              Search Hospital
               </a>
+                <a className='register-patient-nav' href='/admin/registerEntity' style={{marginLeft:20}}>
+             Register Entity
+              </a>
+               <a className='register-patient-nav' href='/admin/searchEntity' style={{marginLeft:20}} >
+             Search Entity
+              </a>
               </>
             )}
            {role === 'patient' && (
             <>
-              <a className='register-patient-nav' href='/patient/giveEmergencyAccess' >
+            <a className='register-patient-nav' href='/patient/myRecords' >
+             My Records
+              </a>
+              <a className='register-patient-nav' href='/patient/giveEmergencyAccess' style={{marginLeft:20}}>
              Emergency Access
               </a>
                <a className='register-patient-nav' href='/patient/viewAccessRequests' style={{marginLeft:20}}>
@@ -64,6 +76,14 @@ const HeaderAppBar = () => {
               <>
               <a className='register-patient-nav' href='/emergencyPerson/seeRequests' >
              Emergency Requests
+              </a>
+              </>
+
+            )}
+            {role === 'researchEntity' && (
+              <>
+              <a className='register-patient-nav' href='/researchEntity/searchRecords' >
+             Get Records
               </a>
               </>
 

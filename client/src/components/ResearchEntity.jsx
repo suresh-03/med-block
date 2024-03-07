@@ -3,13 +3,13 @@ import React from 'react'
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded'
 import { grey } from '@mui/material/colors'
 import useAlert from '../contexts/AlertContext/useAlert'
-import Proof from './Proof.jsx'
+import Proof from './Proof'
 
 
 
 
-const Doctor = ({ doctor }) => {
-  const [doctorId,hospitalId,proofCID] = doctor
+const ResearchEntity = ({ entity }) => {
+  const [entityId,proofCID] = entity
 
 
   const {setAlert} = useAlert()
@@ -29,20 +29,12 @@ const Doctor = ({ doctor }) => {
           <Grid item xs={3}>
             <Box display='flex' flexDirection='column'>
               <Typography variant='h6' color={grey[600]}>
-                Doctor Id
+                Research Entity ID
               </Typography>
-              <Typography variant='h6'>{doctorId}</Typography>
+              <Typography variant='h6'>{entityId}</Typography>
             </Box>
           </Grid>
-          <Grid item xs={10}>
-            <Box display='flex' flexDirection='column'>
-              <Typography variant='h6' color={grey[600]}>
-                Hospital ID
-              </Typography>
-              <Typography variant='h6'>{hospitalId}</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={10}>
+           <Grid item xs={10}>
             <Box display='flex' flexDirection='column'>
               <Typography variant='h6' color={grey[600]}>
                 ID Proof
@@ -53,7 +45,6 @@ const Doctor = ({ doctor }) => {
 
                 setAlert("No Proof Exists",'error')
                 )}
-
             </Box>
           </Grid>
         </Grid>
@@ -67,4 +58,4 @@ const Doctor = ({ doctor }) => {
 }
 
 
-export default Doctor
+export default ResearchEntity
